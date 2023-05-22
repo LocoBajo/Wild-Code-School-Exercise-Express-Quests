@@ -2,15 +2,32 @@ const database = require('./database')
 const mysql = require("mysql2/promise");
 
 const getUsers = (req, res) => {
+
+  let sql = "select * from users"
+  let sqlValues = []
+
+  if (req.query.language != undefined && req.query.city != undefined) {
+    sql = "select * from users where language = ? and city = ?"
+    sqlValues = [req.query.language, req.query.city]
+  }
+  else if (req.query.language != undefined) {
+    sql = "select * from users where language = ?" ; 
+    sqlValues = [req.query.language]
+  }
+
+  else  if (req.query.city != undefined) {
+    sql = "select * from users where city = ?" ; 
+    sqlValues = [req.query.city]
+  }
   database
-  .query("select * from users")
+  .query(sql, sqlValues)
   .then(([users]) => {
   res.status(200).json(users);
 })
 .catch((err) => {
 
   console.error(err);
-cd 
+
   res.status(500).send("Error retrieving data from database");
 
 });

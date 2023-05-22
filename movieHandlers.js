@@ -3,8 +3,22 @@ const database = require('./database')
 const mysql = require("mysql2/promise");
 
 const getMovies = (req, res) => {
+  let sql = "select * from movies"
+  let sqlValues = []
+  if (req.query.color != undefined && req.query.max_duration != undefined) {
+    sql = "select * from movies where color = ? and duration <= ?"
+    sqlValues = [req.query.color, req.query.max_duration]
+  }
+  else if (req.query.color != undefined) {
+    sql = "select * from movies where color = ?" ; 
+    sqlValues = [req.query.color]
+  }
+  else if (req.query.max_duration != undefined) {
+    sql = "select * from movies where duration <= ?"
+    sqlValues = [req.query.max_duration]
+  }
   database
-  .query("select * from movies")
+  .query(sql, sqlValues)
   .then(([movies]) => {
   res.json(movies);
 })
