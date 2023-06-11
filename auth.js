@@ -17,13 +17,9 @@ const password = (req.body.password)
 argon2
 .hash(password, hashingOptions)
 .then((hashedPassword) => {
-    console.log(hashedPassword); 
     req.body.hashedPassword = hashedPassword 
-    console.log(req.body.hashedPassword)
     delete password
-    console.log("test")
     next()
-    console.log("test2")
 }) 
 .catch((err) => {
 

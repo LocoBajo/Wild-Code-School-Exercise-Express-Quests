@@ -82,7 +82,6 @@ database
   }
   else {
     res.status(204)
-    console.log("test3")
   }})
 .catch((err) => {
   console.error(err); 
