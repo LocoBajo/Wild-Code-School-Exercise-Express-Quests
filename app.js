@@ -28,8 +28,10 @@ const userHandlers = require("./userHandlers")
 app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUserById);
 app.post("/api/users",validateUser, hashPassword, userHandlers.postUsers);
+/* app.post("/api/login", userHandlers.authUsers); */
 app.put("/api/users/:id", validateUser, hashPassword, userHandlers.updateUsers);
 app.delete("/api/users/:id", userHandlers.deleteUsers);
+
 
 app.listen(port, (err) => {
   if (err) {

@@ -3,20 +3,20 @@ const mysql = require("mysql2/promise");
 
 const getUsers = (req, res) => {
 
-  let sql = "select * from users"
+  let sql = "select firstname, lastname, email, city, language from users"
   let sqlValues = []
 
   if (req.query.language != undefined && req.query.city != undefined) {
-    sql = "select * from users where language = ? and city = ?"
+    sql = "select firstname, lastname, email, city, language from users where language = ? and city = ?"
     sqlValues = [req.query.language, req.query.city]
   }
   else if (req.query.language != undefined) {
-    sql = "select * from users where language = ?" ; 
+    sql = "select firstname, lastname, email, city, language from users where language = ?" ; 
     sqlValues = [req.query.language]
   }
 
   else  if (req.query.city != undefined) {
-    sql = "select * from users where city = ?" ; 
+    sql = "select firstname, lastname, email, city, language from users where city = ?" ; 
     sqlValues = [req.query.city]
   }
   database
@@ -36,7 +36,7 @@ const getUsers = (req, res) => {
 const getUserById = (req,res) => {
     const id = parseInt(req.params.id);
     database
-    .query("select * from users where id = ?", [id])
+    .query("select firstname, lastname, email, city, language from users where id = ?", [id])
     .then(([users]) => {
         if (users[0] != null) {
           res.json(users[0])  
