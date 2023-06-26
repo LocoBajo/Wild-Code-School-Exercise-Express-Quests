@@ -3,20 +3,20 @@ const mysql = require("mysql2/promise");
 
 const getUsers = (req, res) => {
 
-  let sql = "select firstname, lastname, email, city, language from users"
+  let sql = "select id, firstname, lastname, email, city, language from users"
   let sqlValues = []
 
   if (req.query.language != undefined && req.query.city != undefined) {
-    sql = "select firstname, lastname, email, city, language from users where language = ? and city = ?"
+    sql = "select id, firstname, lastname, email, city, language from users where language = ? and city = ?"
     sqlValues = [req.query.language, req.query.city]
   }
   else if (req.query.language != undefined) {
-    sql = "select firstname, lastname, email, city, language from users where language = ?" ; 
+    sql = "select id, firstname, lastname, email, city, language from users where language = ?" ; 
     sqlValues = [req.query.language]
   }
 
   else  if (req.query.city != undefined) {
-    sql = "select firstname, lastname, email, city, language from users where city = ?" ; 
+    sql = "select id, firstname, lastname, email, city, language from users where city = ?" ; 
     sqlValues = [req.query.city]
   }
   database
@@ -52,6 +52,60 @@ const getUserById = (req,res) => {
 })
 }
 
+/* const authUsers = (req,res) => {
+  const { email, password } = req.body */
+
+/* database
+.query(
+  "INSERT INTO users(email, password) VALUES (?,?,?,?,?,?)", 
+  [firstname, lastname, email, city, language, hashedPassword])
+.then(([result]) => {
+res.location(`/api/users/${result.insertId}`).sendStatus(201);
+}) */
+/* if (password == "123456" && email == "dwight@theoffice.com") {
+
+res.send("Credentials are valid")}
+else 
+{res.status(401)}
+
+res.catch((err) => {
+  console.error(err); 
+  res.status(500).send("Error while trying to login")
+})
+} */
+
+const  getUserByEmailWithPasswordAndPassToNext = (req, res, next) => {
+
+  const email = req.body.email;
+
+
+  database
+
+    .query("select * from users where email = ?", [email])
+
+    .then(([users]) => {
+
+      if (users[0] != null) {
+
+        req.user = users[0];
+
+      next()
+      }
+      else {
+        res.status(401)
+      }
+    })
+
+    .catch((err) => {
+
+      console.error(err);
+
+      res.status(500).send("Error retrieving data from database");
+
+    });
+
+};
+
 const postUsers = (req,res) => {
   const { firstname, lastname, email, city, language, hashedPassword } = req.body
 
@@ -71,7 +125,7 @@ res.location(`/api/users/${result.insertId}`).sendStatus(201);
 const updateUsers = (req,res) => {
   const id = parseInt(req.params.id) 
   const { firstname, lastname, email, city, language, hashedPassword } = req.body
-
+if (id == req.payload.sub) {
 database
 .query(
   "UPDATE users SET firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? WHERE id = ?", 
@@ -88,14 +142,18 @@ database
   res.status(500).send("Error editing the user")
 })
 }
+else {
+  res.status(403)
+}
+}
 
 const deleteUsers = (req, res) => {
 
   const id = parseInt(req.params.id);
+  console.log(req.payload.sub)
 
-
+  if (id == req.payload.sub) {
   database
-
     .query("delete from users where id = ?", [id])
 
     .then(([result]) => {
@@ -104,7 +162,9 @@ const deleteUsers = (req, res) => {
 
         res.status(404).send("Not Found");
 
-      } else {
+      } 
+ 
+      else {
 
         res.sendStatus(204);
 
@@ -119,7 +179,8 @@ const deleteUsers = (req, res) => {
       res.status(500).send("Error deleting the user");
 
     });
-
+  }
+  else {res.status(403)}
 };
 
-module.exports = {getUsers, getUserById, postUsers, updateUsers, deleteUsers}
+module.exports = {getUsers, getUserById, postUsers, getUserByEmailWithPasswordAndPassToNext, updateUsers, deleteUsers}
